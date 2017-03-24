@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/decrement"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/progressview_ripple_oval"
+        android:contentDescription="@string/progressview_decrement"
+        android:scaleType="center"
+        android:tint="?attr/colorAccent"
+        app:srcCompat="@drawable/ic_progressview_down_24dp" />
+
+    <EditText
+        android:id="@+id/progress"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:inputType="number"
+        android:text="0"
+        android:textSize="16sp"
+        tools:ignore="HardcodedText" />
+
+    <TextView
+        android:id="@+id/total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="1dp"
+        android:textSize="16sp"
+        tools:text="/ 24" />
+
+    <ImageView
+        android:id="@+id/increment"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/progressview_ripple_oval"
+        android:contentDescription="@string/progressview_increment"
+        android:scaleType="center"
+        android:tint="?attr/colorAccent"
+        app:srcCompat="@drawable/ic_progressview_up_24dp" />
+</merge>
