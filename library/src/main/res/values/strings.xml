@@ -1,0 +1,4 @@
+<resources>
+    <string name="progressview_decrement">Decrement</string>
+    <string name="progressview_increment">Increment</string>
+</resources>

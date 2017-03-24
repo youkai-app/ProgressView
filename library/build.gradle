@@ -1,0 +1,53 @@
+apply plugin: 'com.android.library'
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'progress-view'
+
+    publishedGroupId = 'app.youkai.progressview'
+    libraryName = 'ProgressView'
+    artifact = 'library'
+
+    libraryDescription = 'A simple android view for numeric progress selection'
+
+    siteUrl = 'https://github.com/youkai-app/ProgressView'
+    gitUrl = 'https://github.com/youkai-app/ProgressView.git'
+
+    libraryVersion = '1.0.0'
+
+    developerId = 'youkai'
+    developerName = 'Youkai'
+    developerEmail = 'x.ihsan@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+
+    defaultConfig {
+        minSdkVersion 9
+        targetSdkVersion 25
+        versionCode 1
+        versionName = libraryVersion
+
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.android.support:appcompat-v7:25.3.0'
+}
+
+apply from: '../install.gradle'
+apply from: '../bintray.gradle'
