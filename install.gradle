@@ -10,7 +10,7 @@ install {
                 packaging 'aar'
                 groupId publishedGroupId
                 artifactId artifact
-
+                version libraryVersion
                 name libraryName
                 description libraryDescription
                 url siteUrl
