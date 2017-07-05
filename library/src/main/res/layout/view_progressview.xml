@@ -24,7 +24,7 @@
         tools:ignore="HardcodedText" />
 
     <TextView
-        android:id="@+id/total"
+        android:id="@+id/max"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="1dp"

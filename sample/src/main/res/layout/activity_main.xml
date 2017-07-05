@@ -12,7 +12,7 @@
         android:id="@+id/progressView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:pv_showTotal="true" />
+        app:pv_showMax="true" />
 
     <TextView
         android:id="@+id/textView"

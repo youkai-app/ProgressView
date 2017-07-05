@@ -28,10 +28,10 @@ import java.util.TimerTask;
 public class ProgressView extends LinearLayout {
     private ImageView decrement;
     private EditText progressView;
-    private TextView totalView;
+    private TextView maxView;
     private ImageView increment;
 
-    private int progress, total;
+    private int progress, max;
 
     private OnProgressChangedListener listener;
 
@@ -63,14 +63,14 @@ public class ProgressView extends LinearLayout {
         setGravity(Gravity.CENTER_VERTICAL);
 
         /* Set android:animateLayoutChanges="true" */
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             setLayoutTransition(new LayoutTransition());
         }
 
         /* Obtain references to our views */
         decrement = (ImageView) findViewById(R.id.decrement);
         progressView = (EditText) findViewById(R.id.progress);
-        totalView = (TextView) findViewById(R.id.total);
+        maxView = (TextView) findViewById(R.id.max);
         increment = (ImageView) findViewById(R.id.increment);
 
         /* Set click listeners */
@@ -131,8 +131,8 @@ public class ProgressView extends LinearLayout {
                                 /* Make sure it's not negative */
                                 newProgress = Math.max(newProgress, 0);
 
-                                /* Make sure it's not greater that the total progress allowed */
-                                if (total != 0 && newProgress > total) newProgress = total;
+                                /* Make sure it's not greater that the maximum */
+                                if (max != 0 && newProgress > max) newProgress = max;
 
                                 /* Set the new progress (on the UI thread) */
                                 progressView.post(new Runnable() {
@@ -153,15 +153,15 @@ public class ProgressView extends LinearLayout {
                 attrs, R.styleable.ProgressView, defStyle, defStyleRes
         );
 
-        boolean showTotal;
+        boolean showMax;
         try {
-            showTotal = a.getBoolean(R.styleable.ProgressView_pv_showTotal, false);
+            showMax = a.getBoolean(R.styleable.ProgressView_pv_showMax, false);
         } finally {
             a.recycle();
         }
 
         /* Apply read values */
-        showTotal(showTotal);
+        showMax(showMax);
     }
 
     @Override
@@ -169,7 +169,7 @@ public class ProgressView extends LinearLayout {
         Parcelable superState = super.onSaveInstanceState();
         SavedState savedState = new SavedState(superState);
         savedState.progress = progress;
-        savedState.total = total;
+        savedState.max = max;
         return savedState;
     }
 
@@ -183,20 +183,31 @@ public class ProgressView extends LinearLayout {
         SavedState savedState = (SavedState) state;
         super.onRestoreInstanceState(savedState.getSuperState());
 
-        this.progress = savedState.progress;
-        this.total = savedState.total;
+        setProgress(savedState.progress);
+        setMax(max);
     }
 
     public void setListener(OnProgressChangedListener listener) {
         this.listener = listener;
     }
 
-    public void setProgress(final int progress) {
-        if (progress < 0) return;
-        if (total != 0 && progress > total) return;
+    public void setProgress(final int progress) throws IllegalArgumentException {
+        if (progress < 0) throw new IllegalArgumentException("Pro-gress cannot be negative. That's con-gress!");
+        if (max != 0 && progress > max) throw new IllegalArgumentException("Progress cannot be greater than the maximum.");
 
         this.progress = progress;
         progressView.setText(String.valueOf(progress));
+
+        // Disabled buttons if at max/min.
+        if (progress == 0) {
+            decrement.setClickable(false);
+        } else if (progress == max) {
+            increment.setClickable(false);
+        } else {
+            decrement.setClickable(true);
+            increment.setClickable(true);
+        }
+
         notifyProgressChanged();
     }
 
@@ -205,21 +216,21 @@ public class ProgressView extends LinearLayout {
     }
 
     @SuppressLint("SetTextI18n")
-    public void setTotal(int total) {
-        if (total <= 0)
-            throw new IllegalArgumentException("Total cannot be less than or equal to zero");
+    public void setMax(int max) {
+        if (max <= 0)
+            throw new IllegalArgumentException("Total cannot be less than or equal to zero.");
 
-        this.total = total;
+        this.max = max;
         fromButton = true;
-        totalView.setText("/ " + total);
+        maxView.setText("/ " + max);
     }
 
-    public int getTotal() {
-        return total;
+    public int getMax() {
+        return max;
     }
 
-    public void showTotal(boolean show) {
-        totalView.setVisibility(show ? VISIBLE : GONE);
+    public void showMax(boolean show) {
+        maxView.setVisibility(show ? VISIBLE : GONE);
     }
 
     private void notifyProgressChanged() {
@@ -234,7 +245,7 @@ public class ProgressView extends LinearLayout {
 
     private static class SavedState extends BaseSavedState {
         int progress;
-        int total;
+        int max;
 
         SavedState(Parcelable superState) {
             super(superState);
@@ -243,14 +254,14 @@ public class ProgressView extends LinearLayout {
         private SavedState(Parcel in) {
             super(in);
             this.progress = in.readInt();
-            this.total = in.readInt();
+            this.max = in.readInt();
         }
 
         @Override
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
             out.writeInt(progress);
-            out.writeInt(total);
+            out.writeInt(max);
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR =

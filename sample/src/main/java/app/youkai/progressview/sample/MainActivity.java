@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
         textView.setText("Progress: " + progressView.getProgress());
 
-        progressView.setTotal(24);
+        progressView.setMax(24);
         progressView.setListener(new ProgressView.OnProgressChangedListener() {
             @Override
             public void onProgressChanged(int progress) {
