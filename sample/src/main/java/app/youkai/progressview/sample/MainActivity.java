@@ -2,7 +2,7 @@ package app.youkai.progressview.sample;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import app.youkai.progressview.ProgressView;
 
@@ -14,13 +14,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final ProgressView progressView = (ProgressView) findViewById(R.id.progressView);
+        final TextView textView = (TextView) findViewById(R.id.textView);
+
+        textView.setText("Progress: " + progressView.getProgress());
 
         progressView.setTotal(24);
         progressView.setListener(new ProgressView.OnProgressChangedListener() {
             @Override
             public void onProgressChanged(int progress) {
-                Toast.makeText(MainActivity.this, "Progress: " + progress, Toast.LENGTH_SHORT).show();
+                textView.setText("Progress: " + progress);
             }
         });
     }
+
 }
