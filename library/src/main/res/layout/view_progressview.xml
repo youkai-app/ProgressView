@@ -39,5 +39,8 @@
         android:contentDescription="@string/progressview_increment"
         android:scaleType="center"
         android:tint="?attr/colorAccent"
-        app:srcCompat="@drawable/ic_progressview_up_24dp" />
+        app:srcCompat="@drawable/ic_progressview_up_24dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginStart="4dp" />
+
 </merge>
