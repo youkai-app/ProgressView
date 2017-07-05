@@ -232,7 +232,7 @@ public class ProgressView extends LinearLayout {
         void onProgressChanged(int progress);
     }
 
-    static class SavedState extends BaseSavedState {
+    private static class SavedState extends BaseSavedState {
         int progress;
         int total;
 
