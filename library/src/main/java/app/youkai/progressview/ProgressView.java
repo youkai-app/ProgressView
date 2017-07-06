@@ -147,7 +147,7 @@ public class ProgressView extends LinearLayout {
                 /* Get that progress text */
                 final String text = progressView.getText().toString().trim();
 
-                /* Don't schedule a timer if the isn't any real change */
+                /* Don't schedule a timer if there isn't any real change */
                 if (lastText.equals(text)) return;
                 lastText = text;
 
@@ -220,8 +220,8 @@ public class ProgressView extends LinearLayout {
         SavedState savedState = (SavedState) state;
         super.onRestoreInstanceState(savedState.getSuperState());
 
-        setProgress(savedState.progress);
         setMax(max);
+        setProgress(savedState.progress);
     }
 
     public void setListener(OnProgressChangedListener listener) {
@@ -234,6 +234,7 @@ public class ProgressView extends LinearLayout {
 
         this.progress = progress;
         progressView.setText(String.valueOf(progress));
+        progressView.setSelection(progressView.getText().length());
 
         // Disabled buttons if at max/min.
         if (progress == 0) {
