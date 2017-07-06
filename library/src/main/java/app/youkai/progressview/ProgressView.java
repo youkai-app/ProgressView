@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
+import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.Editable;
@@ -12,7 +13,6 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -34,6 +34,10 @@ public class ProgressView extends LinearLayout {
     private int progress, max;
 
     private OnProgressChangedListener listener;
+    private LongTouchHandler decrementHandler;
+    private LongTouchHandler incrementHandler;
+
+    private Handler handler;
 
     private boolean fromButton;
 
@@ -62,6 +66,9 @@ public class ProgressView extends LinearLayout {
         setOrientation(HORIZONTAL);
         setGravity(Gravity.CENTER_VERTICAL);
 
+        /* Initialise handler for long press listeners. */
+        handler = new Handler(getContext().getMainLooper());
+
         /* Set android:animateLayoutChanges="true" */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             setLayoutTransition(new LayoutTransition());
@@ -73,19 +80,52 @@ public class ProgressView extends LinearLayout {
         maxView = (TextView) findViewById(R.id.max);
         increment = (ImageView) findViewById(R.id.increment);
 
-        /* Set click listeners */
-        decrement.setOnClickListener(new OnClickListener() {
+        /* Set touch listeners for long click */
+        decrementHandler = new LongTouchHandler(new IncrementListener() {
             @Override
-            public void onClick(View v) {
-                setProgress(progress - 1);
+            public void increment() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        decrementProgress();
+                    }
+                });
             }
-        });
-        increment.setOnClickListener(new OnClickListener() {
+
             @Override
-            public void onClick(View v) {
-                setProgress(progress + 1);
+            public void incrementBy(final int incrementBy) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        addToProgress(incrementBy);
+                    }
+                });
             }
-        });
+        }, -1);
+        decrement.setOnTouchListener(decrementHandler);
+
+        incrementHandler = new LongTouchHandler(new IncrementListener() {
+            @Override
+            public void increment() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        incrementProgress();
+                    }
+                });
+            }
+
+            @Override
+            public void incrementBy(final int incrementBy) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        addToProgress(incrementBy);
+                    }
+                });
+            }
+        }, 1);
+        increment.setOnTouchListener(incrementHandler);
 
         /* Set text change watcher */
         progressView.addTextChangedListener(new TextWatcher() {
@@ -162,6 +202,9 @@ public class ProgressView extends LinearLayout {
 
         /* Apply read values */
         showMax(showMax);
+
+        /* Set initial progress */
+        setProgress(0);
     }
 
     @Override
@@ -201,8 +244,16 @@ public class ProgressView extends LinearLayout {
         // Disabled buttons if at max/min.
         if (progress == 0) {
             decrement.setClickable(false);
+            decrement.setPressed(false);
+            decrementHandler.cancelPress();
+
+            increment.setClickable(true);
         } else if (progress == max) {
             increment.setClickable(false);
+            increment.setPressed(false);
+            incrementHandler.cancelPress();
+
+            decrement.setClickable(true);
         } else {
             decrement.setClickable(true);
             increment.setClickable(true);
@@ -213,6 +264,18 @@ public class ProgressView extends LinearLayout {
 
     public int getProgress() {
         return progress;
+    }
+
+    public void decrementProgress() {
+        setProgress(progress - 1);
+    }
+
+    public void incrementProgress() {
+        setProgress(progress + 1);
+    }
+
+    private void addToProgress(int change) {
+        setProgress(progress + change);
     }
 
     @SuppressLint("SetTextI18n")
