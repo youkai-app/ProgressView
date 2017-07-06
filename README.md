@@ -21,10 +21,10 @@ Usage is extremely simple:
         android:id="@+id/progressView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:pv_showTotal="true" />
+        app:pv_showMax="true" />
 ```
 ```java
-    progressView.setTotal(24);
+    progressView.setMax(24);
     progressView.setListener(new ProgressView.OnProgressChangedListener() {
         @Override
         public void onProgressChanged(int progress) {
@@ -37,8 +37,8 @@ Usage is extremely simple:
     .
 
     progressView.getProgress();
-    progressView.getTotal();
-    progressView.showTotal(false);
+    progressView.getMax();
+    progressView.showMax(false);
 ```
 
 ## Theming
