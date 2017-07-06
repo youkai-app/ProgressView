@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
-import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.Editable;
@@ -37,8 +36,6 @@ public class ProgressView extends LinearLayout {
     private LongTouchHandler decrementHandler;
     private LongTouchHandler incrementHandler;
 
-    private Handler handler;
-
     private boolean fromButton;
 
     public ProgressView(Context context) {
@@ -66,9 +63,6 @@ public class ProgressView extends LinearLayout {
         setOrientation(HORIZONTAL);
         setGravity(Gravity.CENTER_VERTICAL);
 
-        /* Initialise handler for long press listeners. */
-        handler = new Handler(getContext().getMainLooper());
-
         /* Set android:animateLayoutChanges="true" */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             setLayoutTransition(new LayoutTransition());
@@ -84,7 +78,7 @@ public class ProgressView extends LinearLayout {
         decrementHandler = new LongTouchHandler(new IncrementListener() {
             @Override
             public void increment() {
-                handler.post(new Runnable() {
+                decrement.post(new Runnable() {
                     @Override
                     public void run() {
                         decrementProgress();
@@ -93,11 +87,11 @@ public class ProgressView extends LinearLayout {
             }
 
             @Override
-            public void incrementBy(final int incrementBy) {
-                handler.post(new Runnable() {
+            public void incrementBy(final int changeValue) {
+                decrement.post(new Runnable() {
                     @Override
                     public void run() {
-                        addToProgress(incrementBy);
+                        addToProgress(changeValue);
                     }
                 });
             }
@@ -107,7 +101,7 @@ public class ProgressView extends LinearLayout {
         incrementHandler = new LongTouchHandler(new IncrementListener() {
             @Override
             public void increment() {
-                handler.post(new Runnable() {
+                increment.post(new Runnable() {
                     @Override
                     public void run() {
                         incrementProgress();
@@ -116,11 +110,11 @@ public class ProgressView extends LinearLayout {
             }
 
             @Override
-            public void incrementBy(final int incrementBy) {
-                handler.post(new Runnable() {
+            public void incrementBy(final int changeValue) {
+                increment.post(new Runnable() {
                     @Override
                     public void run() {
-                        addToProgress(incrementBy);
+                        addToProgress(changeValue);
                     }
                 });
             }
@@ -234,7 +228,7 @@ public class ProgressView extends LinearLayout {
         this.listener = listener;
     }
 
-    public void setProgress(final int progress) throws IllegalArgumentException {
+    public void setProgress(final int progress) {
         if (progress < 0) throw new IllegalArgumentException("Pro-gress cannot be negative. That's con-gress!");
         if (max != 0 && progress > max) throw new IllegalArgumentException("Progress cannot be greater than the maximum.");
 
@@ -286,6 +280,9 @@ public class ProgressView extends LinearLayout {
         this.max = max;
         fromButton = true;
         maxView.setText("/ " + max);
+
+        /* If the new maximum exceeds the current progress, set the progress to the max. */
+        if (max > progress) setProgress(max);
     }
 
     public int getMax() {
