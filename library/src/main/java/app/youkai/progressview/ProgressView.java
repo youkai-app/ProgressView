@@ -63,6 +63,9 @@ public class ProgressView extends LinearLayout {
         setOrientation(HORIZONTAL);
         setGravity(Gravity.CENTER_VERTICAL);
 
+        /* Make our root clickable, to prevent children from receiving click events from the outside */
+        setClickable(true);
+
         /* Set android:animateLayoutChanges="true" */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             setLayoutTransition(new LayoutTransition());
