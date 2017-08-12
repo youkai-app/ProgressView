@@ -30,7 +30,8 @@ public class ProgressView extends LinearLayout {
     private TextView maxView;
     private ImageView increment;
 
-    private int progress, max;
+    private int progress;
+    private Integer max;
 
     private OnProgressChangedListener listener;
     private LongTouchHandler decrementHandler;
@@ -169,7 +170,7 @@ public class ProgressView extends LinearLayout {
                                 newProgress = Math.max(newProgress, 0);
 
                                 /* Make sure it's not greater that the maximum */
-                                if (max != 0 && newProgress > max) newProgress = max;
+                                if (!progressIsAllowed(newProgress) && newProgress > max) newProgress = max;
 
                                 /* Set the new progress (on the UI thread) */
                                 progressView.post(new Runnable() {
@@ -209,7 +210,7 @@ public class ProgressView extends LinearLayout {
         Parcelable superState = super.onSaveInstanceState();
         SavedState savedState = new SavedState(superState);
         savedState.progress = progress;
-        savedState.max = max;
+        if (max != null) savedState.max = max;
         return savedState;
     }
 
@@ -223,7 +224,7 @@ public class ProgressView extends LinearLayout {
         SavedState savedState = (SavedState) state;
         super.onRestoreInstanceState(savedState.getSuperState());
 
-        setMax(max);
+        if (max != null) setMax(max);
         setProgress(savedState.progress);
     }
 
@@ -233,7 +234,7 @@ public class ProgressView extends LinearLayout {
 
     public void setProgress(final int progress) {
         if (progress < 0) throw new IllegalArgumentException("Pro-gress cannot be negative. That's con-gress!");
-        if (max != 0 && progress > max) throw new IllegalArgumentException("Progress cannot be greater than the maximum.");
+        if (!progressIsAllowed(progress)) throw new IllegalArgumentException("Progress cannot be greater than the maximum.");
 
         this.progress = progress;
         progressView.setText(String.valueOf(progress));
@@ -246,7 +247,7 @@ public class ProgressView extends LinearLayout {
             decrementHandler.cancelPress();
 
             increment.setClickable(true);
-        } else if (progress == max) {
+        } else if (max != null && progress == max) {
             increment.setClickable(false);
             increment.setPressed(false);
             incrementHandler.cancelPress();
@@ -276,20 +277,31 @@ public class ProgressView extends LinearLayout {
         setProgress(progress + change);
     }
 
+    private boolean progressIsAllowed(int progress) {
+        // if there is no maximum, the progress is always allowed
+        return max == null || progress <= max;
+    }
+
     @SuppressLint("SetTextI18n")
     public void setMax(int max) {
         if (max <= 0)
-            throw new IllegalArgumentException("Total cannot be less than or equal to zero.");
+            throw new IllegalArgumentException("Maximum cannot be zero or negative. Use removeMax() to remove the maximum.");
 
         this.max = max;
         fromButton = true;
         maxView.setText("/ " + max);
 
-        /* If the new maximum exceeds the current progress, set the progress to the max. */
-        if (max > progress) setProgress(max);
+        /* If the new maximum is less than the current progress, set the progress to the max. */
+        if (max < progress) setProgress(max);
     }
 
-    public int getMax() {
+    public void removeMax() {
+        max = null;
+        maxView.setText(null);
+        showMax(false);
+    }
+
+    public Integer getMax() {
         return max;
     }
 
